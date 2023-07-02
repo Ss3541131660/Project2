@@ -795,7 +795,124 @@ void gauss_part3_AVX() {
 //}
 //输出结果
 
+void neon() {
+	int T1 = bxhang;
+	//矩阵初始化
+	for (int i = 0; i < juzhen; i++) {
+		for (int j = 0; j < juzhen; j++) {
+			xiaoyuanzi[juzhen][juzhen] = 0;
+		}
+	}
+	//消元子矩阵初始化
+	for (int i = 0; i < bxhang; i++) {
+		for (int j = 0; j < bxhang; j++) {
+			Result[i][j] = 0;
+			beixiaoyuanhang[i][j] = 0;
+		}
+	}
+	//结果矩阵和被消元行矩阵初始化
 
+
+
+	///读入消元子文件内容
+	string s1;
+	int temp1 = xzi;
+	int T = 0;
+	while (temp1 != 0) {
+		getline(ifs, s1);
+		stringstream ss(s1);//一次读入一行
+		int num;
+		while (ss >> num) {
+			if (T == 0) {
+				T = num;
+				//此时T为首项
+			}
+			xiaoyuanzi[T][num] = 1;
+		}
+		T = 0;
+		temp1--;//每读完一行-1
+	}
+
+	string s2;
+	int temp2 = bxhang;
+	while (temp2 != 0) {
+		getline(if1, s2);
+		stringstream ss(s2);
+		int num;
+		while (ss >> num) {
+			beixiaoyuanhang[temp2 - 1][num] = 1;
+		}
+		//T = 0;
+		temp2--;
+	}
+
+	//读入被消元行文件内容
+	struct timespec sts, ets;
+	timespec_get(&sts, TIME_UTC);
+
+	for (int i = bxhang - 1; i >= 0; i--) {
+		for (int j = juzhen - 1; j >= 0; j--) {
+			if (beixiaoyuanhang[i][j] == 1) {
+				// j对应的位置需要消元
+				if (xiaoyuanzi[j][j] == 1) { // 可以消元
+					int k = juzhen - 1;
+					for (; k - 4 >= 0; k -= 4) { // 4个元素一组进行Neon向量运算
+						int32x4_t vec_xiaoyuanzi = vld1q_s32(reinterpret_cast<const int32_t*>(&xiaoyuanzi[j][k])); // 将xiaoyuanzi的4个元素装载到一个Neon向量中
+						int32x4_t vec_xiaoyuanhang = vld1q_s32(reinterpret_cast<const int32_t*>(&beixiaoyuanhang[i][k])); // 将beixiaoyuanhang的4个元素装载到一个Neon向量中
+						vec_xiaoyuanhang = veorq_s32(vec_xiaoyuanhang, vec_xiaoyuanzi); // 将beixiaoyuanhang中对应位置为0的元素变为1
+						vst1q_s32(reinterpret_cast<int32_t*>(&beixiaoyuanhang[i][k]), vec_xiaoyuanhang); // 将Neon向量的结果存储到beixiaoyuanhang的4个元素中
+					}
+					for (; k >= 0; k--) {
+						if (xiaoyuanzi[j][k] == beixiaoyuanhang[i][k]) {
+							beixiaoyuanhang[i][k] = 0;
+						}
+						else {
+							beixiaoyuanhang[i][k] = 1;
+						}
+					}
+				}
+				else { // 升级消元子
+					int k = juzhen - 1;
+					for (; k - 4 >= 0; k -= 4) {
+						int32x4_t vec_xiaoyuanhang = vld1q_s32(reinterpret_cast<const int32_t*>(&beixiaoyuanhang[i][k])); // 将beixiaoyuanhang的4个元素装载到一个Neon向量中
+						vst1q_s32(reinterpret_cast<int32_t*>(&xiaoyuanzi[j][k]), vec_xiaoyuanhang); // 将Neon向量的结果存储到xiaoyuanzi的4个元素中
+						vst1q_s32(reinterpret_cast<int32_t*>(&Result[T1 - 1][k]), vec_xiaoyuanhang); // 将Neon向量的结果存储到Result的4个元素中
+					}
+					for (; k >= 0; k--) {
+						xiaoyuanzi[j][k] = beixiaoyuanhang[i][k];
+						Result[T1 - 1][k] = beixiaoyuanhang[i][k];
+					}
+					T1--;
+					break;
+				}
+			}
+		}
+	}
+
+	timespec_get(&ets, TIME_UTC);
+	time_t dsec = ets.tv_sec - sts.tv_sec;
+	long dnsec = ets.tv_nsec - sts.tv_nsec;
+	if (dnsec < 0) {
+		dsec--;
+		dnsec += 1000000000ll;
+	}
+	printf("%lld.%09llds\n", dsec, dnsec);
+}
+//串行消元
+void getout() {
+	int outtemp = 0;
+	for (int i = bxhang - 1; i >= 0; i--) {
+		for (int j = juzhen - 1; j >= 0; j--) {
+			if (Result[i][j] == 1) {
+				outtemp = 1;
+				out << j << " ";
+			}
+			if (j == 0 && outtemp == 1) {
+				out << endl;
+			}
+		}
+	}
+}
 int main() {
 
 	//check();//验证结果是否正确的函数
