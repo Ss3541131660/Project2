@@ -2,1108 +2,810 @@
 #include<fstream>
 #include<ctime>
 #include<Windows.h>
-#include <immintrin.h>
-#include <intrin.h>
-#include<cerrno>
 #include<string>
 #include<sstream>
-#include <emmintrin.h>
 #include <immintrin.h>
+#include <emmintrin.h>
+#include <intrin.h>
 using namespace std;
-double time1 = 0, time2 = 0, time3 = 0, time4 = 0, time5 = 0, time6 = 0, time7 = 0;
-void chuanx() {
-	ifstream ifs("C://Users//86183//Desktop//±»ÏûÔªĞĞ.txt");//ÎÄ¼şµÄ¶ÁÈë
-	ifstream if1("C://Users//86183//Desktop//ÏûÔª×Ó.txt");
-	ofstream out("C://Users//86183//Desktop//ÏûÔª½á¹û.txt");
+#define juzhen 23045//çŸ©é˜µè§„æ¨¡
+#define xzi 18748//æ¶ˆå…ƒå­è¡Œæ•°
+#define bxhang 14325//è¢«æ¶ˆå…ƒè¡Œ
+int xiaoyuanzi[juzhen][juzhen];//æ¶ˆå…ƒå­çŸ©é˜µ(0-129)
+int beixiaoyuanhang[bxhang][juzhen];//è¢«æ¶ˆå…ƒè¡ŒçŸ©é˜µ
+int Result[bxhang][juzhen];//æ¶ˆå…ƒç»“æœçŸ©é˜µ
+//çŸ©é˜µåˆå§‹åŒ–å’Œæ–‡ä»¶å†…å®¹è¾“å…¥
+//void check() {
+//	int xiaoyuanzitemp = 0;
+//	for (int i = juzhen - 1; i >= 0; i--) {
+//		for (int j = juzhen - 1; j >= 0; j--) {
+//			if (xiaoyuanzi[i][j] == 1) {
+//				xiaoyuanzitemp = 1;
+//				out << j << " ";
+//			}
+//			if (j == 0 && xiaoyuanzitemp == 1) {
+//				out << endl;
+//			}
+//		}
+//		xiaoyuanzitemp = 0;
+//	}
+//
+//	for (int i = juzhen - 1; i >= 0; i--) {
+//		for (int j = juzhen - 1; j >= 0; j--) {
+//			if (xiaoyuanzi[i][j] == 1) {
+//				xiaoyuanzitemp = 1;
+//				cout << j << " ";
+//			}
+//			if (j == 0 && xiaoyuanzitemp == 1) {
+//				cout << endl;
+//			}
+//		}
+//		xiaoyuanzitemp = 0;
+//	}
+//}
+//éªŒè¯æ¶ˆå…ƒå­æ˜¯å¦æ­£ç¡®
+//çŸ©é˜µåˆå§‹åŒ–å’Œæ–‡ä»¶è¯»å…¥
+void xiaoyuan() {
+	ifstream if1("C://Users//86183//Desktop//è¢«æ¶ˆå…ƒè¡Œ.txt");//æ–‡ä»¶çš„è¯»å…¥
+	ifstream ifs("C://Users//86183//Desktop//æ¶ˆå…ƒå­.txt");//æ–‡ä»¶è¯»å…¥
+	ofstream out("C://Users//86183//Desktop//æ¶ˆå…ƒç»“æœ.txt");//æ–‡ä»¶å†™å‡º
 
-	int forline = 8;//±»ÏûÔªĞĞ8ĞĞ
-	int line = 22;//ÏûÔª×Ó22ĞĞ
-	int artix = 130;//Ã¿Ò»ĞĞÓĞ130¸öÔªËØ
-
-	int xiaoyuanzi[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanzi[i][j] = 0;
+	int T1 = bxhang;
+	//çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < juzhen; i++) {
+		for (int j = 0; j < juzhen; j++) {
+			xiaoyuanzi[juzhen][juzhen] = 0;
 		}
 	}
-
-
-
-	int xiaoyuanhang[8][130];
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanhang[i][j] = 0;
-		}
-	}
-	//ÏûÔª½á¹û¾ØÕó
-
-
-
-	int Result[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
+	//æ¶ˆå…ƒå­çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < bxhang; i++) {
+		for (int j = 0; j < bxhang; j++) {
 			Result[i][j] = 0;
+			beixiaoyuanhang[i][j] = 0;
 		}
 	}
-
-	string s;
-	int temp1 = 0;
-	for (int i = 1; i <= 22; i++) {
-		getline(if1, s);
-		stringstream ss(s);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			if (temp1 == 0) {
-				temp1 = num;
-			}
-			xiaoyuanzi[temp1][num] = 1;//Ã¿Ò»ĞĞµÚÒ»¸öÔªËØÎª¸ÃĞĞ±àºÅ£¬Í¬Ò»ĞĞÏàÓ¦Î»ÖÃÎª1
-		}
-		temp1 = 0;
-	}
-	//ÏûÔª×Ó¶ÁÈë
+	//ç»“æœçŸ©é˜µå’Œè¢«æ¶ˆå…ƒè¡ŒçŸ©é˜µåˆå§‹åŒ–
 
 
+
+	///è¯»å…¥æ¶ˆå…ƒå­æ–‡ä»¶å†…å®¹
 	string s1;
-	for (int i = 1; i <= 8; i++) {
+	int temp1 = xzi;
+	int T = 0;
+	while (temp1 != 0) {
 		getline(ifs, s1);
-		stringstream ss(s1);
+		stringstream ss(s1);//ä¸€æ¬¡è¯»å…¥ä¸€è¡Œ
 		int num;
 		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			xiaoyuanhang[i - 1][num] = 1;
+			if (T == 0) {
+				T = num;
+				//æ­¤æ—¶Tä¸ºé¦–é¡¹
+			}
+			xiaoyuanzi[T][num] = 1;
 		}
+		T = 0;
+		temp1--;//æ¯è¯»å®Œä¸€è¡Œ-1
 	}
-	//ÏûÔª×ÓµÄ¶ÁÈë
 
-
-	long long head3, tail3, freq3; // timers
-	// similar to CLOCKS_PER_SEC
-	QueryPerformanceFrequency((LARGE_INTEGER*)&freq3);
-	// start time
-	QueryPerformanceCounter((LARGE_INTEGER*)&head3);
-
-	int t = 0;//ÕıÔÚÏûÔª
-	int T = 0;
-	while (true) {
-		if (t == 8) {
-			break;
+	string s2;
+	int temp2 = bxhang;
+	while (temp2 != 0) {
+		getline(if1, s2);
+		stringstream ss(s2);
+		int num;
+		while (ss >> num) {
+			beixiaoyuanhang[temp2 - 1][num] = 1;
 		}
-		for (int j = 129; j>=0; j--) {
-			if (xiaoyuanhang[t][j] == 1) {//µÈÓÚ1
-				T = 1;
-				if (xiaoyuanzi[j][j] == 0) {//Éı¼¶ÏûÔª×Ó
-					for (int k =0; k < 130; k++) {
-						xiaoyuanzi[j][k] = xiaoyuanhang[t][k];
-						Result[j][k] = xiaoyuanhang[t][k];
-					}
-					t++;
-					//cout << "easeasd" << result[j][j] << " " << j << endl;
-					//cout << t << endl;
-					break;
-				}
-				else {
-					for (int k =0; k < 130; k++) {
-						if (xiaoyuanzi[j][k] == xiaoyuanhang[t][k]) {
-							xiaoyuanhang[t][k] = 0;
+		//T = 0;
+		temp2--;
+	}
+
+	//è¯»å…¥è¢«æ¶ˆå…ƒè¡Œæ–‡ä»¶å†…å®¹
+
+	long long head, tail, freq;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+	QueryPerformanceCounter((LARGE_INTEGER*)&head);
+	//å¼€å§‹æµ‹è¯•
+
+	for (int i = bxhang - 1; i >= 0; i--) {
+		for (int j = juzhen - 1; j >= 0; j--) {
+			if (beixiaoyuanhang[i][j] == 1) {
+				//jå¯¹åº”çš„ä½ç½®éœ€è¦æ¶ˆå…ƒ
+				if (xiaoyuanzi[j][j] == 1) {//å¯ä»¥æ¶ˆå…ƒ
+					for (int k = juzhen - 1; k >= 0; k--) {
+						//å¼‚æˆ–æ¶ˆå…ƒ
+						if (xiaoyuanzi[j][k] == beixiaoyuanhang[i][k]) {
+							beixiaoyuanhang[i][k] = 0;
 						}
 						else {
-							xiaoyuanhang[t][k] = 1;
+							beixiaoyuanhang[i][k] = 1;
 						}
 					}
 				}
-			}
-		}
-		if (T == 1) {
-			T = 0;
-		}
-		else {
-			//t=0£¬È«0£¬±»ÏûÔªÍêÁË
-			t++;
-		}
-	}
-
-	QueryPerformanceCounter((LARGE_INTEGER*)&tail3);
-	time1 += (tail3 - head3) * 1000.0 / freq3;
-	/*cout << "¸ßË¹ÏûÔª´®ĞĞËã·¨²¢ĞĞ»¯ÔËĞĞÊ±¼äÎª " << (tail3 - head3) * 1000.0 / freq3 << "ms" << endl;
-
-
-	int temp2 = 0;
-	for (int i = 129; i >= 0; i--)
-	{
-		for (int j = 129; j >= 0; j--) {
-			if (Result[i][j] == 1) {
-				cout << j << " ";
-				temp2 = 1;
-			}
-			if (j == 0 && temp2 == 1) {
-				cout << endl;
-				temp2 = 0;
-			}
-		}
-	}*/
-
-	ifs.close();
-}
-void SSE1() {
-	ifstream ifs("C://Users//86183//Desktop//±»ÏûÔªĞĞ.txt");//ÎÄ¼şµÄ¶ÁÈë
-	ifstream if1("C://Users//86183//Desktop//ÏûÔª×Ó.txt");
-	ofstream out("C://Users//86183//Desktop//ÏûÔª½á¹û.txt");
-
-	int forline = 8;//±»ÏûÔªĞĞ8ĞĞ
-	int line = 22;//ÏûÔª×Ó22ĞĞ
-	int artix = 130;//Ã¿Ò»ĞĞÓĞ130¸öÔªËØ
-
-	int xiaoyuanzi[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanzi[i][j] = 0;
-		}
-	}
-
-
-
-	int xiaoyuanhang[8][130];
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanhang[i][j] = 0;
-		}
-	}
-	//ÏûÔª½á¹û¾ØÕó
-
-
-
-	int Result[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			Result[i][j] = 0;
-		}
-	}
-
-	string s;
-	int temp1 = 0;
-	for (int i = 1; i <= 22; i++) {
-		getline(if1, s);
-		stringstream ss(s);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			if (temp1 == 0) {
-				temp1 = num;
-			}
-			xiaoyuanzi[temp1][num] = 1;//Ã¿Ò»ĞĞµÚÒ»¸öÔªËØÎª¸ÃĞĞ±àºÅ£¬Í¬Ò»ĞĞÏàÓ¦Î»ÖÃÎª1
-		}
-		temp1 = 0;
-	}
-	//ÏûÔª×Ó¶ÁÈë
-
-
-	string s1;
-	for (int i = 1; i <= 8; i++) {
-		getline(ifs, s1);
-		stringstream ss(s1);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			xiaoyuanhang[i - 1][num] = 1;
-		}
-	}
-	//ÏûÔª×ÓµÄ¶ÁÈë
-
-	
-	long long head3, tail3, freq3; // timers
-	// similar to CLOCKS_PER_SEC
-	QueryPerformanceFrequency((LARGE_INTEGER*)&freq3);
-	// start time
-	QueryPerformanceCounter((LARGE_INTEGER*)&head3);
-
-	//int t = 0;//ÕıÔÚÏûÔª
-	//int T = 0;
-	//while (true) {
-	//	if (t == 8) {
-	//		break;
-	//	}
-	//	for (int j = 129; j>=0; j--) {
-	//		if (xiaoyuanhang[t][j] == 1) {//µÈÓÚ1
-	//			T = 1;
-	//			if (xiaoyuanzi[j][j] == 0) {//Éı¼¶ÏûÔª×Ó
-	//				for (int k =0; k < 130; k++) {
-	//					xiaoyuanzi[j][k] = xiaoyuanhang[t][k];
-	//					Result[j][k] = xiaoyuanhang[t][k];
-	//				}
-	//				t++;
-	//				//cout << "easeasd" << result[j][j] << " " << j << endl;
-	//				//cout << t << endl;
-	//				break;
-	//			}
-	//			else {
-	//				for (int k =0; k < 130; k++) {
-	//					if (xiaoyuanzi[j][k] == xiaoyuanhang[t][k]) {
-	//						xiaoyuanhang[t][k] = 0;
-	//					}
-	//					else {
-	//						xiaoyuanhang[t][k] = 1;
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//	if (T == 1) {
-	//		T = 0;
-	//	}
-	//	else {
-	//		//t=0£¬È«0£¬±»ÏûÔªÍêÁË
-	//		t++;
-	//	}
-	//}
-	// 
-	// 
-	// 
-	// end time
-
-
-
-
-	int t = 0;//ÕıÔÚÏûÔª
-	int T = 0;
-
-	//__m128i ones = _mm_set1_epi32(1); // ³õÊ¼»¯Ò»¸öÈ«Îª1µÄÏòÁ¿
-
-	while (true) {
-		if (t == 8) {
-			break;
-		}
-		for (int j = 129; j >= 0; j--) {
-			if (xiaoyuanhang[t][j] == 1) { //µÈÓÚ1
-				T = 1;
-				if (xiaoyuanzi[j][j] == 0) { //Éı¼¶ÏûÔª×Ó
-					for (int k = 0; k+4 < 130; k += 4) { // 4¸öÔªËØÒ»×é½øĞĞSSEÏòÁ¿ÔËËã
-						__m128i vec_xiaoyuanhang = _mm_loadu_si128((__m128i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ4¸öÔªËØ×°ÔØµ½Ò»¸öSSEÏòÁ¿ÖĞ
-						_mm_storeu_si128((__m128i*) & xiaoyuanzi[j][k], vec_xiaoyuanhang); // ½«SSEÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanziµÄ4¸öÔªËØÖĞ
-						_mm_storeu_si128((__m128i*) & Result[j][k], vec_xiaoyuanhang); // ½«SSEÏòÁ¿µÄ½á¹û´æ´¢µ½ResultµÄ4¸öÔªËØÖĞ
+				else {//å‡çº§æ¶ˆå…ƒå­
+					for (int k = juzhen - 1; k >= 0; k--) {
+						xiaoyuanzi[j][k] = beixiaoyuanhang[i][k];
+						Result[T1 - 1][k] = beixiaoyuanhang[i][k];
 					}
-					t++;
+					T1--;
 					break;
 				}
-				//else {
-				//	for (int k = 0; k + 4 < 130; k += 4) { // 4¸öÔªËØÒ»×é½øĞĞSSEÏòÁ¿ÔËËã
-				//		__m128i vec_xiaoyuanzi = _mm_loadu_si128((__m128i*) & xiaoyuanzi[j][k]); // ½«xiaoyuanziµÄ4¸öÔªËØ×°ÔØµ½Ò»¸öSSEÏòÁ¿ÖĞ
-				//		__m128i vec_xiaoyuanhang = _mm_loadu_si128((__m128i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ4¸öÔªËØ×°ÔØµ½Ò»¸öSSEÏòÁ¿ÖĞ
-				//		vec_xiaoyuanhang = _mm_xor_si128(vec_xiaoyuanhang, vec_xiaoyuanzi); // ½«xiaoyuanhangÖĞ¶ÔÓ¦Î»ÖÃÎª0µÄÔªËØ±äÎª1
-				//		_mm_storeu_si128((__m128i*) & xiaoyuanhang[t][k], vec_xiaoyuanhang); // ½«SSEÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanhangµÄ4¸öÔªËØÖĞ
-				//	}
-				//}
+			}
+		}
+	}
+	QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+	//åœæ­¢æµ‹è¯•
+	cout << "time:" << (tail - head) * 1000.0 / freq << "ms" << endl;
+	// è¾“å‡ºç»“æœ
+}
+//ä¸²è¡Œæ¶ˆå…ƒ
+void gauss_part1_SIMD() {
+	ifstream if1("C://Users//86183//Desktop//è¢«æ¶ˆå…ƒè¡Œ.txt");//æ–‡ä»¶çš„è¯»å…¥
+	ifstream ifs("C://Users//86183//Desktop//æ¶ˆå…ƒå­.txt");//æ–‡ä»¶è¯»å…¥
+	ofstream out("C://Users//86183//Desktop//æ¶ˆå…ƒç»“æœ.txt");//æ–‡ä»¶å†™å‡º
+
+	int T1 = bxhang;
+	//çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < juzhen; i++) {
+		for (int j = 0; j < juzhen; j++) {
+			xiaoyuanzi[juzhen][juzhen] = 0;
+		}
+	}
+	//æ¶ˆå…ƒå­çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < bxhang; i++) {
+		for (int j = 0; j < bxhang; j++) {
+			Result[i][j] = 0;
+			beixiaoyuanhang[i][j] = 0;
+		}
+	}
+	//ç»“æœçŸ©é˜µå’Œè¢«æ¶ˆå…ƒè¡ŒçŸ©é˜µåˆå§‹åŒ–
 
 
-				else {
-					for (int k = 0; k < 130; k++) {
-						if (xiaoyuanzi[j][k] == xiaoyuanhang[t][k]) {
-							xiaoyuanhang[t][k] = 0;
+
+	///è¯»å…¥æ¶ˆå…ƒå­æ–‡ä»¶å†…å®¹
+	string s1;
+	int temp1 = xzi;
+	int T = 0;
+	while (temp1 != 0) {
+		getline(ifs, s1);
+		stringstream ss(s1);//ä¸€æ¬¡è¯»å…¥ä¸€è¡Œ
+		int num;
+		while (ss >> num) {
+			if (T == 0) {
+				T = num;
+				//æ­¤æ—¶Tä¸ºé¦–é¡¹
+			}
+			xiaoyuanzi[T][num] = 1;
+		}
+		T = 0;
+		temp1--;//æ¯è¯»å®Œä¸€è¡Œ-1
+	}
+
+	string s2;
+	int temp2 = bxhang;
+	while (temp2 != 0) {
+		getline(if1, s2);
+		stringstream ss(s2);
+		int num;
+		while (ss >> num) {
+			beixiaoyuanhang[temp2 - 1][num] = 1;
+		}
+		//T = 0;
+		temp2--;
+	}
+
+	//è¯»å…¥è¢«æ¶ˆå…ƒè¡Œæ–‡ä»¶å†…å®¹
+
+	long long head, tail, freq;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+	QueryPerformanceCounter((LARGE_INTEGER*)&head);
+	//å¼€å§‹æµ‹è¯•
+
+	for (int i = bxhang - 1; i >= 0; i--) {
+		for (int j = juzhen - 1; j >= 0; j--) {
+			if (beixiaoyuanhang[i][j] == 1) {
+				//jå¯¹åº”çš„ä½ç½®éœ€è¦æ¶ˆå…ƒ
+				if (xiaoyuanzi[j][j] == 1) {//å¯ä»¥æ¶ˆå…ƒ
+					for (int k = juzhen - 1; k >= 0; k--) {
+						//å¼‚æˆ–æ¶ˆå…ƒ
+						if (xiaoyuanzi[j][k] == beixiaoyuanhang[i][k]) {
+							beixiaoyuanhang[i][k] = 0;
 						}
 						else {
-							xiaoyuanhang[t][k] = 1;
+							beixiaoyuanhang[i][k] = 1;
 						}
 					}
 				}
-
-
-			}
-		}
-		if (T == 1) {
-			T = 0;
-		}
-		else {
-			//t=0£¬È«0£¬±»ÏûÔªÍêÁË
-			t++;
-		}
-	}
-
-
-
-
-
-	//__m256i ones = _mm256_set1_epi32(1); // ³õÊ¼»¯Ò»¸öÈ«Îª1µÄÏòÁ¿
-
-	//while (true) {
-	//	if (t == 8) {
-	//		break;
-	//	}
-	//	for (int j = 129; j >= 0; j--) {
-	//		if (xiaoyuanhang[t][j] == 1) { //µÈÓÚ1
-	//			T = 1;
-	//			if (xiaoyuanzi[j][j] == 0) { //Éı¼¶ÏûÔª×Ó
-	//				for (int k = 0; k + 8 < 130; k += 8) { // 8¸öÔªËØÒ»×é½øĞĞAVXÏòÁ¿ÔËËã
-	//					__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-	//					_mm256_storeu_si256((__m256i*) & xiaoyuanzi[j][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanziµÄ8¸öÔªËØÖĞ
-	//					_mm256_storeu_si256((__m256i*) & Result[j][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½ResultµÄ8¸öÔªËØÖĞ
-	//				}
-	//				t++;
-	//				break;
-	//			}
-	//			else {
-	//				for (int k = 0; k < 130; k++) {
-	//					if (xiaoyuanzi[j][k] == xiaoyuanhang[t][k]) {
-	//						xiaoyuanhang[t][k] = 0;
-	//					}
-	//					else {
-	//						xiaoyuanhang[t][k] = 1;
-	//					}
-	//				}
-	//			}
-	//			//else {
-	//			//	for (int k = 0; k + 8 < 130; k += 8) { // 8¸öÔªËØÒ»×é½øĞĞAVXÏòÁ¿ÔËËã
-	//			//		__m256i vec_xiaoyuanzi = _mm256_loadu_si256((__m256i*) & xiaoyuanzi[j][k]); // ½«xiaoyuanziµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-	//			//		__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-	//			//		vec_xiaoyuanhang = _mm256_xor_si256(vec_xiaoyuanhang, vec_xiaoyuanzi); // ½«xiaoyuanhangÖĞ¶ÔÓ¦Î»ÖÃÎª0µÄÔªËØ±äÎª1
-	//			//		_mm256_storeu_si256((__m256i*) & xiaoyuanhang[t][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanhangµÄ8¸öÔªËØÖĞ
-	//			//	}
-	//			//}
-	//		}
-	//	}
-	//	if (T == 1) {
-	//		T = 0;
-	//	}
-	//	else {
-	//		//t=0£¬È«0£¬±»ÏûÔªÍêÁË
-	//		t++;
-	//	}
-	//}
-
-
-	QueryPerformanceCounter((LARGE_INTEGER*)&tail3);
-	//cout << "ÌØÊâ¸ßË¹ÏûÔªSSE´æ´¢¹ı³Ì²¢ĞĞ»¯ÔËĞĞÊ±¼äÎª " << (tail3 - head3) * 1000.0 / freq3 << "ms" << endl;
-	time2 += (tail3 - head3) * 1000.0 / freq3;
-
-	/*int temp2 = 0;
-	for (int i = 129; i >= 0; i--)
-	{
-		for (int j = 129; j >= 0; j--) {
-			if (Result[i][j] == 1) {
-				cout << j << " ";
-				temp2 = 1;
-			}
-			if (j == 0 && temp2 == 1) {
-				cout << endl;
-				temp2 = 0;
-			}
-		}
-	}*/
-
-	ifs.close();
-}
-void SSE2() {
-	ifstream ifs("C://Users//86183//Desktop//±»ÏûÔªĞĞ.txt");//ÎÄ¼şµÄ¶ÁÈë
-	ifstream if1("C://Users//86183//Desktop//ÏûÔª×Ó.txt");
-	ofstream out("C://Users//86183//Desktop//ÏûÔª½á¹û.txt");
-
-	int forline = 8;//±»ÏûÔªĞĞ8ĞĞ
-	int line = 22;//ÏûÔª×Ó22ĞĞ
-	int artix = 130;//Ã¿Ò»ĞĞÓĞ130¸öÔªËØ
-
-	int xiaoyuanzi[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanzi[i][j] = 0;
-		}
-	}
-
-
-
-	int xiaoyuanhang[8][130];
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanhang[i][j] = 0;
-		}
-	}
-	//ÏûÔª½á¹û¾ØÕó
-
-	int Result[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			Result[i][j] = 0;
-		}
-	}
-
-	string s;
-	int temp1 = 0;
-	for (int i = 1; i <= 22; i++) {
-		getline(if1, s);
-		stringstream ss(s);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			if (temp1 == 0) {
-				temp1 = num;
-			}
-			xiaoyuanzi[temp1][num] = 1;//Ã¿Ò»ĞĞµÚÒ»¸öÔªËØÎª¸ÃĞĞ±àºÅ£¬Í¬Ò»ĞĞÏàÓ¦Î»ÖÃÎª1
-		}
-		temp1 = 0;
-	}
-	//ÏûÔª×Ó¶ÁÈë
-
-	string s1;
-	for (int i = 1; i <= 8; i++) {
-		getline(ifs, s1);
-		stringstream ss(s1);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			xiaoyuanhang[i - 1][num] = 1;
-		}
-	}
-	//ÏûÔª×ÓµÄ¶ÁÈë
-
-
-	long long head3, tail3, freq3; // timers
-	// similar to CLOCKS_PER_SEC
-	QueryPerformanceFrequency((LARGE_INTEGER*)&freq3);
-	// start time
-	QueryPerformanceCounter((LARGE_INTEGER*)&head3);
-
-	int t = 0;//ÕıÔÚÏûÔª
-	int T = 0;
-
-	while (true) {
-		if (t == 8) {
-			break;
-		}
-		for (int j = 129; j >= 0; j--) {
-			if (xiaoyuanhang[t][j] == 1) { //µÈÓÚ1
-				T = 1;
-				if (xiaoyuanzi[j][j] == 0) {//Éı¼¶ÏûÔª×Ó
-					for (int k = 0; k < 130; k++) {
-						xiaoyuanzi[j][k] = xiaoyuanhang[t][k];
-						Result[j][k] = xiaoyuanhang[t][k];
+				else {//å‡çº§æ¶ˆå…ƒå­
+					int k = juzhen - 1;
+					for (; k - 4 >= 0; k -= 4) {
+						__m128i vec_xiaoyuanhang = _mm_loadu_si128((__m128i*) & beixiaoyuanhang[i][k]);
+						//å°†beoxiaoyuanhangçš„4ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªSSEå‘é‡ä¸­
+						_mm_storeu_si128((__m128i*) & xiaoyuanzi[j][k], vec_xiaoyuanhang);
+						//å°†SSEå‘é‡çš„ç»“æœå­˜å‚¨åˆ°xiaoyuanziçš„4ä¸ªå…ƒç´ ä¸­
+						_mm_storeu_si128((__m128i*) & Result[T1 - 1][k], vec_xiaoyuanhang);
+						//å°†SSEå‘é‡çš„ç»“æœå­˜å‚¨åˆ°Resultçš„4ä¸ªå…ƒç´ ä¸­
 					}
-					t++;
-					//cout << "easeasd" << result[j][j] << " " << j << endl;
-					//cout << t << endl;
+					for (; k >= 0; k--) {
+						xiaoyuanzi[j][k] = beixiaoyuanhang[i][k];
+						Result[T1 - 1][k] = beixiaoyuanhang[i][k];
+					}
+					T1--;
 					break;
 				}
-				else {
-					for (int k = 0; k + 4 < 130; k += 4) { // 4¸öÔªËØÒ»×é½øĞĞSSEÏòÁ¿ÔËËã
-						__m128i vec_xiaoyuanzi = _mm_loadu_si128((__m128i*) & xiaoyuanzi[j][k]); // ½«xiaoyuanziµÄ4¸öÔªËØ×°ÔØµ½Ò»¸öSSEÏòÁ¿ÖĞ
-						__m128i vec_xiaoyuanhang = _mm_loadu_si128((__m128i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ4¸öÔªËØ×°ÔØµ½Ò»¸öSSEÏòÁ¿ÖĞ
-						vec_xiaoyuanhang = _mm_xor_si128(vec_xiaoyuanhang, vec_xiaoyuanzi); // ½«xiaoyuanhangÖĞ¶ÔÓ¦Î»ÖÃÎª0µÄÔªËØ±äÎª1
-						_mm_storeu_si128((__m128i*) & xiaoyuanhang[t][k], vec_xiaoyuanhang); // ½«SSEÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanhangµÄ4¸öÔªËØÖĞ
-					}
-				}
 			}
-		}
-		if (T == 1) {
-			T = 0;
-		}
-		else {
-			//t=0£¬È«0£¬±»ÏûÔªÍêÁË
-			t++;
 		}
 	}
+	QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+	//åœæ­¢æµ‹è¯•
+	cout << "SSE_part1_time:" << (tail - head) * 1000.0 / freq << "ms" << endl;
+	// è¾“å‡ºç»“æœ
 
-
-	QueryPerformanceCounter((LARGE_INTEGER*)&tail3);
-	//cout << "ÌØÊâ¸ßË¹ÏûÔªSSE´æ´¢¹ı³Ì²¢ĞĞ»¯ÔËĞĞÊ±¼äÎª " << (tail3 - head3) * 1000.0 / freq3 << "ms" << endl;
-	time3 += (tail3 - head3) * 1000.0 / freq3;
-
-	/*int temp2 = 0;
-	for (int i = 129; i >= 0; i--)
-	{
-		for (int j = 129; j >= 0; j--) {
-			if (Result[i][j] == 1) {
-				cout << j << " ";
-				temp2 = 1;
-			}
-			if (j == 0 && temp2 == 1) {
-				cout << endl;
-				temp2 = 0;
-			}
-		}
-	}*/
-
-	ifs.close();
 }
-void SSE3() {
-	ifstream ifs("C://Users//86183//Desktop//±»ÏûÔªĞĞ.txt");//ÎÄ¼şµÄ¶ÁÈë
-	ifstream if1("C://Users//86183//Desktop//ÏûÔª×Ó.txt");
-	ofstream out("C://Users//86183//Desktop//ÏûÔª½á¹û.txt");
+//å‡çº§æ¶ˆå…ƒå­éƒ¨åˆ†SIMDå¹¶è¡Œ
+void gauss_part2_SIMD() {
+	ifstream if1("C://Users//86183//Desktop//è¢«æ¶ˆå…ƒè¡Œ.txt");//æ–‡ä»¶çš„è¯»å…¥
+	ifstream ifs("C://Users//86183//Desktop//æ¶ˆå…ƒå­.txt");//æ–‡ä»¶è¯»å…¥
+	ofstream out("C://Users//86183//Desktop//æ¶ˆå…ƒç»“æœ.txt");//æ–‡ä»¶å†™å‡º
 
-	int forline = 8;//±»ÏûÔªĞĞ8ĞĞ
-	int line = 22;//ÏûÔª×Ó22ĞĞ
-	int artix = 130;//Ã¿Ò»ĞĞÓĞ130¸öÔªËØ
-
-	int xiaoyuanzi[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanzi[i][j] = 0;
+	int T1 = bxhang;
+	//çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < juzhen; i++) {
+		for (int j = 0; j < juzhen; j++) {
+			xiaoyuanzi[juzhen][juzhen] = 0;
 		}
 	}
-
-
-
-	int xiaoyuanhang[8][130];
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanhang[i][j] = 0;
-		}
-	}
-	//ÏûÔª½á¹û¾ØÕó
-
-
-
-	int Result[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
+	//æ¶ˆå…ƒå­çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < bxhang; i++) {
+		for (int j = 0; j < bxhang; j++) {
 			Result[i][j] = 0;
+			beixiaoyuanhang[i][j] = 0;
 		}
 	}
-
-	string s;
-	int temp1 = 0;
-	for (int i = 1; i <= 22; i++) {
-		getline(if1, s);
-		stringstream ss(s);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			if (temp1 == 0) {
-				temp1 = num;
-			}
-			xiaoyuanzi[temp1][num] = 1;//Ã¿Ò»ĞĞµÚÒ»¸öÔªËØÎª¸ÃĞĞ±àºÅ£¬Í¬Ò»ĞĞÏàÓ¦Î»ÖÃÎª1
-		}
-		temp1 = 0;
-	}
-	//ÏûÔª×Ó¶ÁÈë
+	//ç»“æœçŸ©é˜µå’Œè¢«æ¶ˆå…ƒè¡ŒçŸ©é˜µåˆå§‹åŒ–
 
 
+
+	///è¯»å…¥æ¶ˆå…ƒå­æ–‡ä»¶å†…å®¹
 	string s1;
-	for (int i = 1; i <= 8; i++) {
-		getline(ifs, s1);
-		stringstream ss(s1);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			xiaoyuanhang[i - 1][num] = 1;
-		}
-	}
-	//ÏûÔª×ÓµÄ¶ÁÈë
-
-
-	long long head3, tail3, freq3; // timers
-	// similar to CLOCKS_PER_SEC
-	QueryPerformanceFrequency((LARGE_INTEGER*)&freq3);
-	// start time
-	QueryPerformanceCounter((LARGE_INTEGER*)&head3);
-
-
-
-
-
-	int t = 0;//ÕıÔÚÏûÔª
+	int temp1 = xzi;
 	int T = 0;
-
-
-	while (true) {
-		if (t == 8) {
-			break;
-		}
-		for (int j = 129; j >= 0; j--) {
-			if (xiaoyuanhang[t][j] == 1) { //µÈÓÚ1
-				T = 1;
-				if (xiaoyuanzi[j][j] == 0) { //Éı¼¶ÏûÔª×Ó
-					for (int k = 0; k + 4 < 130; k += 4) { // 4¸öÔªËØÒ»×é½øĞĞSSEÏòÁ¿ÔËËã
-						__m128i vec_xiaoyuanhang = _mm_loadu_si128((__m128i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ4¸öÔªËØ×°ÔØµ½Ò»¸öSSEÏòÁ¿ÖĞ
-						_mm_storeu_si128((__m128i*) & xiaoyuanzi[j][k], vec_xiaoyuanhang); // ½«SSEÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanziµÄ4¸öÔªËØÖĞ
-						_mm_storeu_si128((__m128i*) & Result[j][k], vec_xiaoyuanhang); // ½«SSEÏòÁ¿µÄ½á¹û´æ´¢µ½ResultµÄ4¸öÔªËØÖĞ
-					}
-					t++;
-					break;
-				}
-				else {
-					for (int k = 0; k + 4 < 130; k += 4) { // 4¸öÔªËØÒ»×é½øĞĞSSEÏòÁ¿ÔËËã
-						__m128i vec_xiaoyuanzi = _mm_loadu_si128((__m128i*) & xiaoyuanzi[j][k]); // ½«xiaoyuanziµÄ4¸öÔªËØ×°ÔØµ½Ò»¸öSSEÏòÁ¿ÖĞ
-						__m128i vec_xiaoyuanhang = _mm_loadu_si128((__m128i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ4¸öÔªËØ×°ÔØµ½Ò»¸öSSEÏòÁ¿ÖĞ
-						vec_xiaoyuanhang = _mm_xor_si128(vec_xiaoyuanhang, vec_xiaoyuanzi); // ½«xiaoyuanhangÖĞ¶ÔÓ¦Î»ÖÃÎª0µÄÔªËØ±äÎª1
-						_mm_storeu_si128((__m128i*) & xiaoyuanhang[t][k], vec_xiaoyuanhang); // ½«SSEÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanhangµÄ4¸öÔªËØÖĞ
-					}
-				}
-			}
-		}
-		if (T == 1) {
-			T = 0;
-		}
-		else {
-			//t=0£¬È«0£¬±»ÏûÔªÍêÁË
-			t++;
-		}
-	}
-
-
-
-
-
-
-
-
-	QueryPerformanceCounter((LARGE_INTEGER*)&tail3);
-	//cout << "ÌØÊâ¸ßË¹ÏûÔªSSE´æ´¢¹ı³Ì²¢ĞĞ»¯ÔËĞĞÊ±¼äÎª " << (tail3 - head3) * 1000.0 / freq3 << "ms" << endl;
-	time4 += (tail3 - head3) * 1000.0 / freq3;
-
-	/*int temp2 = 0;
-	for (int i = 129; i >= 0; i--)
-	{
-		for (int j = 129; j >= 0; j--) {
-			if (Result[i][j] == 1) {
-				cout << j << " ";
-				temp2 = 1;
-			}
-			if (j == 0 && temp2 == 1) {
-				cout << endl;
-				temp2 = 0;
-			}
-		}
-	}*/
-
-	ifs.close();
-}
-void AVX4() {
-	ifstream ifs("C://Users//86183//Desktop//±»ÏûÔªĞĞ.txt");//ÎÄ¼şµÄ¶ÁÈë
-	ifstream if1("C://Users//86183//Desktop//ÏûÔª×Ó.txt");
-	ofstream out("C://Users//86183//Desktop//ÏûÔª½á¹û.txt");
-
-	int forline = 8;//±»ÏûÔªĞĞ8ĞĞ
-	int line = 22;//ÏûÔª×Ó22ĞĞ
-	int artix = 130;//Ã¿Ò»ĞĞÓĞ130¸öÔªËØ
-
-	int xiaoyuanzi[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanzi[i][j] = 0;
-		}
-	}
-
-
-
-	int xiaoyuanhang[8][130];
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanhang[i][j] = 0;
-		}
-	}
-	//ÏûÔª½á¹û¾ØÕó
-
-	int Result[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			Result[i][j] = 0;
-		}
-	}
-
-	string s;
-	int temp1 = 0;
-	for (int i = 1; i <= 22; i++) {
-		getline(if1, s);
-		stringstream ss(s);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			if (temp1 == 0) {
-				temp1 = num;
-			}
-			xiaoyuanzi[temp1][num] = 1;//Ã¿Ò»ĞĞµÚÒ»¸öÔªËØÎª¸ÃĞĞ±àºÅ£¬Í¬Ò»ĞĞÏàÓ¦Î»ÖÃÎª1
-		}
-		temp1 = 0;
-	}
-	//ÏûÔª×Ó¶ÁÈë
-
-	string s1;
-	for (int i = 1; i <= 8; i++) {
+	while (temp1 != 0) {
 		getline(ifs, s1);
-		stringstream ss(s1);
+		stringstream ss(s1);//ä¸€æ¬¡è¯»å…¥ä¸€è¡Œ
 		int num;
 		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			xiaoyuanhang[i - 1][num] = 1;
+			if (T == 0) {
+				T = num;
+				//æ­¤æ—¶Tä¸ºé¦–é¡¹
+			}
+			xiaoyuanzi[T][num] = 1;
 		}
+		T = 0;
+		temp1--;//æ¯è¯»å®Œä¸€è¡Œ-1
 	}
-	//ÏûÔª×ÓµÄ¶ÁÈë
 
-
-	long long head3, tail3, freq3; // timers
-	// similar to CLOCKS_PER_SEC
-	QueryPerformanceFrequency((LARGE_INTEGER*)&freq3);
-	// start time
-	QueryPerformanceCounter((LARGE_INTEGER*)&head3);
-
-	int t = 0;//ÕıÔÚÏûÔª
-	int T = 0;
-
-	
-
-	while (true) {
-		if (t == 8) {
-			break;
+	string s2;
+	int temp2 = bxhang;
+	while (temp2 != 0) {
+		getline(if1, s2);
+		stringstream ss(s2);
+		int num;
+		while (ss >> num) {
+			beixiaoyuanhang[temp2 - 1][num] = 1;
 		}
-		for (int j = 129; j >= 0; j--) {
-			if (xiaoyuanhang[t][j] == 1) { //µÈÓÚ1
-				T = 1;
-				if (xiaoyuanzi[j][j] == 0) { //Éı¼¶ÏûÔª×Ó
-					for (int k = 0; k + 8 < 130; k += 8) { // 8¸öÔªËØÒ»×é½øĞĞAVXÏòÁ¿ÔËËã
-						__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-						_mm256_storeu_si256((__m256i*) & xiaoyuanzi[j][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanziµÄ8¸öÔªËØÖĞ
-						_mm256_storeu_si256((__m256i*) & Result[j][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½ResultµÄ8¸öÔªËØÖĞ
+		//T = 0;
+		temp2--;
+	}
+
+	//è¯»å…¥è¢«æ¶ˆå…ƒè¡Œæ–‡ä»¶å†…å®¹
+
+	long long head, tail, freq;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+	QueryPerformanceCounter((LARGE_INTEGER*)&head);
+	//å¼€å§‹æµ‹è¯•
+
+	for (int i = bxhang - 1; i >= 0; i--) {
+		for (int j = juzhen - 1; j >= 0; j--) {
+			if (beixiaoyuanhang[i][j] == 1) {
+				//jå¯¹åº”çš„ä½ç½®éœ€è¦æ¶ˆå…ƒ
+				if (xiaoyuanzi[j][j] == 1) {//å¯ä»¥æ¶ˆå…ƒ
+					int k = juzhen - 1;
+					for (; k - 4 >= 0; k -= 4) { // 4ä¸ªå…ƒç´ ä¸€ç»„è¿›è¡ŒSSEå‘é‡è¿ç®—
+						__m128i vec_xiaoyuanzi = _mm_loadu_si128((__m128i*) & xiaoyuanzi[j][k]); // å°†xiaoyuanziçš„4ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªSSEå‘é‡ä¸­
+						__m128i vec_xiaoyuanhang = _mm_loadu_si128((__m128i*) & beixiaoyuanhang[i][k]); // å°†beixiaoyuanhangçš„4ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªSSEå‘é‡ä¸­
+						vec_xiaoyuanhang = _mm_xor_si128(vec_xiaoyuanhang, vec_xiaoyuanzi); // å°†beixiaoyuanhangä¸­å¯¹åº”ä½ç½®ä¸º0çš„å…ƒç´ å˜ä¸º1
+						_mm_storeu_si128((__m128i*) & beixiaoyuanhang[i][k], vec_xiaoyuanhang); // å°†SSEå‘é‡çš„ç»“æœå­˜å‚¨åˆ°beixiaoyuanhangçš„4ä¸ªå…ƒç´ ä¸­
 					}
-					t++;
-					break;
-				}
-				else {
-					for (int k = 0; k < 130; k++) {
-						if (xiaoyuanzi[j][k] == xiaoyuanhang[t][k]) {
-							xiaoyuanhang[t][k] = 0;
+					for (; k >= 0; k--) {
+						//å¼‚æˆ–æ¶ˆå…ƒ
+						if (xiaoyuanzi[j][k] == beixiaoyuanhang[i][k]) {
+							beixiaoyuanhang[i][k] = 0;
 						}
 						else {
-							xiaoyuanhang[t][k] = 1;
+							beixiaoyuanhang[i][k] = 1;
 						}
 					}
 				}
-				//else {
-				//	for (int k = 0; k + 8 < 130; k += 8) { // 8¸öÔªËØÒ»×é½øĞĞAVXÏòÁ¿ÔËËã
-				//		__m256i vec_xiaoyuanzi = _mm256_loadu_si256((__m256i*) & xiaoyuanzi[j][k]); // ½«xiaoyuanziµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-				//		__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-				//		vec_xiaoyuanhang = _mm256_xor_si256(vec_xiaoyuanhang, vec_xiaoyuanzi); // ½«xiaoyuanhangÖĞ¶ÔÓ¦Î»ÖÃÎª0µÄÔªËØ±äÎª1
-				//		_mm256_storeu_si256((__m256i*) & xiaoyuanhang[t][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanhangµÄ8¸öÔªËØÖĞ
-				//	}
-				//}
-			}
-		}
-		if (T == 1) {
-			T = 0;
-		}
-		else {
-			//t=0£¬È«0£¬±»ÏûÔªÍêÁË
-			t++;
-		}
-	}
-
-
-	QueryPerformanceCounter((LARGE_INTEGER*)&tail3);
-	//cout << "ÌØÊâ¸ßË¹ÏûÔªSSE´æ´¢¹ı³Ì²¢ĞĞ»¯ÔËĞĞÊ±¼äÎª " << (tail3 - head3) * 1000.0 / freq3 << "ms" << endl;
-	time5 += (tail3 - head3) * 1000.0 / freq3;
-
-	/*int temp2 = 0;
-	for (int i = 129; i >= 0; i--)
-	{
-		for (int j = 129; j >= 0; j--) {
-			if (Result[i][j] == 1) {
-				cout << j << " ";
-				temp2 = 1;
-			}
-			if (j == 0 && temp2 == 1) {
-				cout << endl;
-				temp2 = 0;
-			}
-		}
-	}*/
-
-	ifs.close();
-}
-void AVX5() {
-	ifstream ifs("C://Users//86183//Desktop//±»ÏûÔªĞĞ.txt");//ÎÄ¼şµÄ¶ÁÈë
-	ifstream if1("C://Users//86183//Desktop//ÏûÔª×Ó.txt");
-	ofstream out("C://Users//86183//Desktop//ÏûÔª½á¹û.txt");
-
-	int forline = 8;//±»ÏûÔªĞĞ8ĞĞ
-	int line = 22;//ÏûÔª×Ó22ĞĞ
-	int artix = 130;//Ã¿Ò»ĞĞÓĞ130¸öÔªËØ
-
-	int xiaoyuanzi[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanzi[i][j] = 0;
-		}
-	}
-
-
-
-	int xiaoyuanhang[8][130];
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanhang[i][j] = 0;
-		}
-	}
-	//ÏûÔª½á¹û¾ØÕó
-
-	int Result[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			Result[i][j] = 0;
-		}
-	}
-
-	string s;
-	int temp1 = 0;
-	for (int i = 1; i <= 22; i++) {
-		getline(if1, s);
-		stringstream ss(s);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			if (temp1 == 0) {
-				temp1 = num;
-			}
-			xiaoyuanzi[temp1][num] = 1;//Ã¿Ò»ĞĞµÚÒ»¸öÔªËØÎª¸ÃĞĞ±àºÅ£¬Í¬Ò»ĞĞÏàÓ¦Î»ÖÃÎª1
-		}
-		temp1 = 0;
-	}
-	//ÏûÔª×Ó¶ÁÈë
-
-	string s1;
-	for (int i = 1; i <= 8; i++) {
-		getline(ifs, s1);
-		stringstream ss(s1);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			xiaoyuanhang[i - 1][num] = 1;
-		}
-	}
-	//ÏûÔª×ÓµÄ¶ÁÈë
-
-
-	long long head3, tail3, freq3; // timers
-	// similar to CLOCKS_PER_SEC
-	QueryPerformanceFrequency((LARGE_INTEGER*)&freq3);
-	// start time
-	QueryPerformanceCounter((LARGE_INTEGER*)&head3);
-
-	int t = 0;//ÕıÔÚÏûÔª
-	int T = 0;
-
-
-
-	while (true) {
-		if (t == 8) {
-			break;
-		}
-		for (int j = 129; j >= 0; j--) {
-			if (xiaoyuanhang[t][j] == 1) { //µÈÓÚ1
-				T = 1;
-				if (xiaoyuanzi[j][j] == 0) {//Éı¼¶ÏûÔª×Ó
-					for (int k = 0; k < 130; k++) {
-						xiaoyuanzi[j][k] = xiaoyuanhang[t][k];
-						Result[j][k] = xiaoyuanhang[t][k];
+				else {//å‡çº§æ¶ˆå…ƒå­
+					for (int k = juzhen - 1; k >= 0; k--) {
+						xiaoyuanzi[j][k] = beixiaoyuanhang[i][k];
+						Result[T1 - 1][k] = beixiaoyuanhang[i][k];
 					}
-					t++;
-					//cout << "easeasd" << result[j][j] << " " << j << endl;
-					//cout << t << endl;
+					T1--;
 					break;
 				}
-				/*	else {
-						for (int k = 0; k < 130; k++) {
-							if (xiaoyuanzi[j][k] == xiaoyuanhang[t][k]) {
-								xiaoyuanhang[t][k] = 0;
-							}
-							else {
-								xiaoyuanhang[t][k] = 1;
-							}
+			}
+		}
+	}
+
+	QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+	//åœæ­¢æµ‹è¯•
+	cout << "SSE_part2_time:" << (tail - head) * 1000.0 / freq << "ms" << endl;
+	// è¾“å‡ºç»“æœ
+}
+//å¼‚æˆ–éƒ¨åˆ†SIMDå¹¶è¡Œ
+void gauss_part3_SIMD() {
+	ifstream if1("C://Users//86183//Desktop//è¢«æ¶ˆå…ƒè¡Œ.txt");//æ–‡ä»¶çš„è¯»å…¥
+	ifstream ifs("C://Users//86183//Desktop//æ¶ˆå…ƒå­.txt");//æ–‡ä»¶è¯»å…¥
+	ofstream out("C://Users//86183//Desktop//æ¶ˆå…ƒç»“æœ.txt");//æ–‡ä»¶å†™å‡º
+
+	int T1 = bxhang;
+	//çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < juzhen; i++) {
+		for (int j = 0; j < juzhen; j++) {
+			xiaoyuanzi[juzhen][juzhen] = 0;
+		}
+	}
+	//æ¶ˆå…ƒå­çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < bxhang; i++) {
+		for (int j = 0; j < bxhang; j++) {
+			Result[i][j] = 0;
+			beixiaoyuanhang[i][j] = 0;
+		}
+	}
+	//ç»“æœçŸ©é˜µå’Œè¢«æ¶ˆå…ƒè¡ŒçŸ©é˜µåˆå§‹åŒ–
+
+
+
+	///è¯»å…¥æ¶ˆå…ƒå­æ–‡ä»¶å†…å®¹
+	string s1;
+	int temp1 = xzi;
+	int T = 0;
+	while (temp1 != 0) {
+		getline(ifs, s1);
+		stringstream ss(s1);//ä¸€æ¬¡è¯»å…¥ä¸€è¡Œ
+		int num;
+		while (ss >> num) {
+			if (T == 0) {
+				T = num;
+				//æ­¤æ—¶Tä¸ºé¦–é¡¹
+			}
+			xiaoyuanzi[T][num] = 1;
+		}
+		T = 0;
+		temp1--;//æ¯è¯»å®Œä¸€è¡Œ-1
+	}
+
+	string s2;
+	int temp2 = bxhang;
+	while (temp2 != 0) {
+		getline(if1, s2);
+		stringstream ss(s2);
+		int num;
+		while (ss >> num) {
+			beixiaoyuanhang[temp2 - 1][num] = 1;
+		}
+		//T = 0;
+		temp2--;
+	}
+
+	//è¯»å…¥è¢«æ¶ˆå…ƒè¡Œæ–‡ä»¶å†…å®¹
+
+	long long head, tail, freq;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+	QueryPerformanceCounter((LARGE_INTEGER*)&head);
+	//å¼€å§‹æµ‹è¯•
+
+	for (int i = bxhang - 1; i >= 0; i--) {
+		for (int j = juzhen - 1; j >= 0; j--) {
+			if (beixiaoyuanhang[i][j] == 1) {
+				//jå¯¹åº”çš„ä½ç½®éœ€è¦æ¶ˆå…ƒ
+				if (xiaoyuanzi[j][j] == 1) {//å¯ä»¥æ¶ˆå…ƒ
+					int k = juzhen - 1;
+					for (; k - 4 >= 0; k -= 4) { // 4ä¸ªå…ƒç´ ä¸€ç»„è¿›è¡ŒSSEå‘é‡è¿ç®—
+						__m128i vec_xiaoyuanzi = _mm_loadu_si128((__m128i*) & xiaoyuanzi[j][k]); // å°†xiaoyuanziçš„4ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªSSEå‘é‡ä¸­
+						__m128i vec_xiaoyuanhang = _mm_loadu_si128((__m128i*) & beixiaoyuanhang[i][k]); // å°†beixiaoyuanhangçš„4ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªSSEå‘é‡ä¸­
+						vec_xiaoyuanhang = _mm_xor_si128(vec_xiaoyuanhang, vec_xiaoyuanzi); // å°†beixiaoyuanhangä¸­å¯¹åº”ä½ç½®ä¸º0çš„å…ƒç´ å˜ä¸º1
+						_mm_storeu_si128((__m128i*) & beixiaoyuanhang[i][k], vec_xiaoyuanhang); // å°†SSEå‘é‡çš„ç»“æœå­˜å‚¨åˆ°beixiaoyuanhangçš„4ä¸ªå…ƒç´ ä¸­
+					}
+					for (; k >= 0; k--) {
+						//å¼‚æˆ–æ¶ˆå…ƒ
+						if (xiaoyuanzi[j][k] == beixiaoyuanhang[i][k]) {
+							beixiaoyuanhang[i][k] = 0;
 						}
-					}*/
-				else {
-					for (int k = 0; k + 8 < 130; k += 8) { // 8¸öÔªËØÒ»×é½øĞĞAVXÏòÁ¿ÔËËã
-						__m256i vec_xiaoyuanzi = _mm256_loadu_si256((__m256i*) & xiaoyuanzi[j][k]); // ½«xiaoyuanziµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-						__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-						vec_xiaoyuanhang = _mm256_xor_si256(vec_xiaoyuanhang, vec_xiaoyuanzi); // ½«xiaoyuanhangÖĞ¶ÔÓ¦Î»ÖÃÎª0µÄÔªËØ±äÎª1
-						_mm256_storeu_si256((__m256i*) & xiaoyuanhang[t][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanhangµÄ8¸öÔªËØÖĞ
+						else {
+							beixiaoyuanhang[i][k] = 1;
+						}
 					}
 				}
-			}
-		}
-		if (T == 1) {
-			T = 0;
-		}
-		else {
-			//t=0£¬È«0£¬±»ÏûÔªÍêÁË
-			t++;
-		}
-	}
-
-
-	QueryPerformanceCounter((LARGE_INTEGER*)&tail3);
-	//cout << "ÌØÊâ¸ßË¹ÏûÔªSSE´æ´¢¹ı³Ì²¢ĞĞ»¯ÔËĞĞÊ±¼äÎª " << (tail3 - head3) * 1000.0 / freq3 << "ms" << endl;
-	time6 += (tail3 - head3) * 1000.0 / freq3;
-
-	/*int temp2 = 0;
-	for (int i = 129; i >= 0; i--)
-	{
-		for (int j = 129; j >= 0; j--) {
-			if (Result[i][j] == 1) {
-				cout << j << " ";
-				temp2 = 1;
-			}
-			if (j == 0 && temp2 == 1) {
-				cout << endl;
-				temp2 = 0;
-			}
-		}
-	}*/
-
-	ifs.close();
-}
-void AVX6() {
-	ifstream ifs("C://Users//86183//Desktop//±»ÏûÔªĞĞ.txt");//ÎÄ¼şµÄ¶ÁÈë
-	ifstream if1("C://Users//86183//Desktop//ÏûÔª×Ó.txt");
-	ofstream out("C://Users//86183//Desktop//ÏûÔª½á¹û.txt");
-
-	int forline = 8;//±»ÏûÔªĞĞ8ĞĞ
-	int line = 22;//ÏûÔª×Ó22ĞĞ
-	int artix = 130;//Ã¿Ò»ĞĞÓĞ130¸öÔªËØ
-
-	int xiaoyuanzi[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanzi[i][j] = 0;
-		}
-	}
-
-
-
-	int xiaoyuanhang[8][130];
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 130; j++) {
-			xiaoyuanhang[i][j] = 0;
-		}
-	}
-	//ÏûÔª½á¹û¾ØÕó
-
-	int Result[130][130];
-	for (int i = 0; i < 130; i++) {
-		for (int j = 0; j < 130; j++) {
-			Result[i][j] = 0;
-		}
-	}
-
-	string s;
-	int temp1 = 0;
-	for (int i = 1; i <= 22; i++) {
-		getline(if1, s);
-		stringstream ss(s);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			if (temp1 == 0) {
-				temp1 = num;
-			}
-			xiaoyuanzi[temp1][num] = 1;//Ã¿Ò»ĞĞµÚÒ»¸öÔªËØÎª¸ÃĞĞ±àºÅ£¬Í¬Ò»ĞĞÏàÓ¦Î»ÖÃÎª1
-		}
-		temp1 = 0;
-	}
-	//ÏûÔª×Ó¶ÁÈë
-
-	string s1;
-	for (int i = 1; i <= 8; i++) {
-		getline(ifs, s1);
-		stringstream ss(s1);
-		int num;
-		while (ss >> num) {
-			//¿ªÊ¼ÏûÔª
-			xiaoyuanhang[i - 1][num] = 1;
-		}
-	}
-	//ÏûÔª×ÓµÄ¶ÁÈë
-
-
-	long long head3, tail3, freq3; // timers
-	// similar to CLOCKS_PER_SEC
-	QueryPerformanceFrequency((LARGE_INTEGER*)&freq3);
-	// start time
-	QueryPerformanceCounter((LARGE_INTEGER*)&head3);
-
-	int t = 0;//ÕıÔÚÏûÔª
-	int T = 0;
-
-
-
-	while (true) {
-		if (t == 8) {
-			break;
-		}
-		for (int j = 129; j >= 0; j--) {
-			if (xiaoyuanhang[t][j] == 1) { //µÈÓÚ1
-				T = 1;
-				if (xiaoyuanzi[j][j] == 0) { //Éı¼¶ÏûÔª×Ó
-					for (int k = 0; k + 8 < 130; k += 8) { // 8¸öÔªËØÒ»×é½øĞĞAVXÏòÁ¿ÔËËã
-						__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-						_mm256_storeu_si256((__m256i*) & xiaoyuanzi[j][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanziµÄ8¸öÔªËØÖĞ
-						_mm256_storeu_si256((__m256i*) & Result[j][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½ResultµÄ8¸öÔªËØÖĞ
+				else {//å‡çº§æ¶ˆå…ƒå­
+					int k = juzhen - 1;
+					for (; k - 4 >= 0; k -= 4) {
+						__m128i vec_xiaoyuanhang = _mm_loadu_si128((__m128i*) & beixiaoyuanhang[i][k]);
+						//å°†beixiaoyuanhangçš„4ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªSSEå‘é‡ä¸­
+						_mm_storeu_si128((__m128i*) & xiaoyuanzi[j][k], vec_xiaoyuanhang);
+						//å°†SSEå‘é‡çš„ç»“æœå­˜å‚¨åˆ°xiaoyuanziçš„4ä¸ªå…ƒç´ ä¸­
+						_mm_storeu_si128((__m128i*) & Result[T1 - 1][k], vec_xiaoyuanhang);
+						//å°†SSEå‘é‡çš„ç»“æœå­˜å‚¨åˆ°Resultçš„4ä¸ªå…ƒç´ ä¸­
 					}
-					t++;
+					for (; k >= 0; k--) {
+						xiaoyuanzi[j][k] = beixiaoyuanhang[i][k];
+						Result[T1 - 1][k] = beixiaoyuanhang[i][k];
+					}
+					T1--;
 					break;
 				}
-				/*	else {
-						for (int k = 0; k < 130; k++) {
-							if (xiaoyuanzi[j][k] == xiaoyuanhang[t][k]) {
-								xiaoyuanhang[t][k] = 0;
-							}
-							else {
-								xiaoyuanhang[t][k] = 1;
-							}
-						}
-					}*/
-				else {
-					for (int k = 0; k + 8 < 130; k += 8) { // 8¸öÔªËØÒ»×é½øĞĞAVXÏòÁ¿ÔËËã
-						__m256i vec_xiaoyuanzi = _mm256_loadu_si256((__m256i*) & xiaoyuanzi[j][k]); // ½«xiaoyuanziµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-						__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & xiaoyuanhang[t][k]); // ½«xiaoyuanhangµÄ8¸öÔªËØ×°ÔØµ½Ò»¸öAVXÏòÁ¿ÖĞ
-						vec_xiaoyuanhang = _mm256_xor_si256(vec_xiaoyuanhang, vec_xiaoyuanzi); // ½«xiaoyuanhangÖĞ¶ÔÓ¦Î»ÖÃÎª0µÄÔªËØ±äÎª1
-						_mm256_storeu_si256((__m256i*) & xiaoyuanhang[t][k], vec_xiaoyuanhang); // ½«AVXÏòÁ¿µÄ½á¹û´æ´¢µ½xiaoyuanhangµÄ8¸öÔªËØÖĞ
-					}
-				}
 			}
-		}
-		if (T == 1) {
-			T = 0;
-		}
-		else {
-			//t=0£¬È«0£¬±»ÏûÔªÍêÁË
-			t++;
 		}
 	}
 
+	QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+	//åœæ­¢æµ‹è¯•
+	cout << "SSE_part3_time:" << (tail - head) * 1000.0 / freq << "ms" << endl;
+	// è¾“å‡ºç»“æœ
+}
+//å®Œå…¨SIMDå¹¶è¡Œ
+void gauss_part1_AVX() {
+	ifstream if1("C://Users//86183//Desktop//è¢«æ¶ˆå…ƒè¡Œ.txt");//æ–‡ä»¶çš„è¯»å…¥
+	ifstream ifs("C://Users//86183//Desktop//æ¶ˆå…ƒå­.txt");//æ–‡ä»¶è¯»å…¥
+	ofstream out("C://Users//86183//Desktop//æ¶ˆå…ƒç»“æœ.txt");//æ–‡ä»¶å†™å‡º
 
-	QueryPerformanceCounter((LARGE_INTEGER*)&tail3);
-	//cout << "ÌØÊâ¸ßË¹ÏûÔªSSE´æ´¢¹ı³Ì²¢ĞĞ»¯ÔËĞĞÊ±¼äÎª " << (tail3 - head3) * 1000.0 / freq3 << "ms" << endl;
-	time7+= (tail3 - head3) * 1000.0 / freq3;
+	int T1 = bxhang;
+	//çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < juzhen; i++) {
+		for (int j = 0; j < juzhen; j++) {
+			xiaoyuanzi[juzhen][juzhen] = 0;
+		}
+	}
+	//æ¶ˆå…ƒå­çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < bxhang; i++) {
+		for (int j = 0; j < bxhang; j++) {
+			Result[i][j] = 0;
+			beixiaoyuanhang[i][j] = 0;
+		}
+	}
+	//ç»“æœçŸ©é˜µå’Œè¢«æ¶ˆå…ƒè¡ŒçŸ©é˜µåˆå§‹åŒ–
 
-	/*int temp2 = 0;
-	for (int i = 129; i >= 0; i--)
-	{
-		for (int j = 129; j >= 0; j--) {
-			if (Result[i][j] == 1) {
-				cout << j << " ";
-				temp2 = 1;
+
+
+	///è¯»å…¥æ¶ˆå…ƒå­æ–‡ä»¶å†…å®¹
+	string s1;
+	int temp1 = xzi;
+	int T = 0;
+	while (temp1 != 0) {
+		getline(ifs, s1);
+		stringstream ss(s1);//ä¸€æ¬¡è¯»å…¥ä¸€è¡Œ
+		int num;
+		while (ss >> num) {
+			if (T == 0) {
+				T = num;
+				//æ­¤æ—¶Tä¸ºé¦–é¡¹
 			}
-			if (j == 0 && temp2 == 1) {
-				cout << endl;
-				temp2 = 0;
+			xiaoyuanzi[T][num] = 1;
+		}
+		T = 0;
+		temp1--;//æ¯è¯»å®Œä¸€è¡Œ-1
+	}
+
+	string s2;
+	int temp2 = bxhang;
+	while (temp2 != 0) {
+		getline(if1, s2);
+		stringstream ss(s2);
+		int num;
+		while (ss >> num) {
+			beixiaoyuanhang[temp2 - 1][num] = 1;
+		}
+		//T = 0;
+		temp2--;
+	}
+
+	//è¯»å…¥è¢«æ¶ˆå…ƒè¡Œæ–‡ä»¶å†…å®¹
+
+	long long head, tail, freq;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+	QueryPerformanceCounter((LARGE_INTEGER*)&head);
+	//å¼€å§‹æµ‹è¯•
+
+	for (int i = bxhang - 1; i >= 0; i--) {
+		for (int j = juzhen - 1; j >= 0; j--) {
+			if (beixiaoyuanhang[i][j] == 1) {
+				//jå¯¹åº”çš„ä½ç½®éœ€è¦æ¶ˆå…ƒ
+				if (xiaoyuanzi[j][j] == 1) {//å¯ä»¥æ¶ˆå…ƒ
+					for (int k = juzhen - 1; k >= 0; k--) {
+						//å¼‚æˆ–æ¶ˆå…ƒ
+						if (xiaoyuanzi[j][k] == beixiaoyuanhang[i][k]) {
+							beixiaoyuanhang[i][k] = 0;
+						}
+						else {
+							beixiaoyuanhang[i][k] = 1;
+						}
+					}
+				}
+				else {//å‡çº§æ¶ˆå…ƒå­
+					int k = juzhen - 1;
+					for (; k - 8 >= 0; k -= 8) {
+						__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & beixiaoyuanhang[i][k]); // å°†beixiaoyuanhangçš„8ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªAVXå‘é‡ä¸­
+						_mm256_storeu_si256((__m256i*) & xiaoyuanzi[j][k], vec_xiaoyuanhang); // å°†AVXå‘é‡çš„ç»“æœå­˜å‚¨åˆ°xiaoyuanziçš„8ä¸ªå…ƒç´ ä¸­
+						_mm256_storeu_si256((__m256i*) & Result[T1 - 1][k], vec_xiaoyuanhang); // å°†AVXå‘é‡çš„ç»“æœå­˜å‚¨åˆ°Resultçš„8ä¸ªå…ƒç´ ä¸­
+					}
+					for (; k >= 0; k--) {
+						xiaoyuanzi[j][k] = beixiaoyuanhang[i][k];
+						Result[T1 - 1][k] = beixiaoyuanhang[i][k];
+					}
+					T1--;
+					break;
+				}
 			}
 		}
-	}*/
+	}
 
-	ifs.close();
+	QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+	//åœæ­¢æµ‹è¯•
+	cout << "SSE_part1_time:" << (tail - head) * 1000.0 / freq << "ms" << endl;
+	// è¾“å‡ºç»“æœ
 }
+//å‡çº§æ¶ˆå…ƒå­éƒ¨åˆ†AVXå¹¶è¡Œ
+void gauss_part2_AVX() {
+	ifstream if1("C://Users//86183//Desktop//è¢«æ¶ˆå…ƒè¡Œ.txt");//æ–‡ä»¶çš„è¯»å…¥
+	ifstream ifs("C://Users//86183//Desktop//æ¶ˆå…ƒå­.txt");//æ–‡ä»¶è¯»å…¥
+	ofstream out("C://Users//86183//Desktop//æ¶ˆå…ƒç»“æœ.txt");//æ–‡ä»¶å†™å‡º
+
+	int T1 = bxhang;
+	//çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < juzhen; i++) {
+		for (int j = 0; j < juzhen; j++) {
+			xiaoyuanzi[juzhen][juzhen] = 0;
+		}
+	}
+	//æ¶ˆå…ƒå­çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < bxhang; i++) {
+		for (int j = 0; j < bxhang; j++) {
+			Result[i][j] = 0;
+			beixiaoyuanhang[i][j] = 0;
+		}
+	}
+	//ç»“æœçŸ©é˜µå’Œè¢«æ¶ˆå…ƒè¡ŒçŸ©é˜µåˆå§‹åŒ–
+
+
+
+	///è¯»å…¥æ¶ˆå…ƒå­æ–‡ä»¶å†…å®¹
+	string s1;
+	int temp1 = xzi;
+	int T = 0;
+	while (temp1 != 0) {
+		getline(ifs, s1);
+		stringstream ss(s1);//ä¸€æ¬¡è¯»å…¥ä¸€è¡Œ
+		int num;
+		while (ss >> num) {
+			if (T == 0) {
+				T = num;
+				//æ­¤æ—¶Tä¸ºé¦–é¡¹
+			}
+			xiaoyuanzi[T][num] = 1;
+		}
+		T = 0;
+		temp1--;//æ¯è¯»å®Œä¸€è¡Œ-1
+	}
+
+	string s2;
+	int temp2 = bxhang;
+	while (temp2 != 0) {
+		getline(if1, s2);
+		stringstream ss(s2);
+		int num;
+		while (ss >> num) {
+			beixiaoyuanhang[temp2 - 1][num] = 1;
+		}
+		//T = 0;
+		temp2--;
+	}
+
+	//è¯»å…¥è¢«æ¶ˆå…ƒè¡Œæ–‡ä»¶å†…å®¹
+
+	long long head, tail, freq;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+	QueryPerformanceCounter((LARGE_INTEGER*)&head);
+	//å¼€å§‹æµ‹è¯•
+
+	for (int i = bxhang - 1; i >= 0; i--) {
+		for (int j = juzhen - 1; j >= 0; j--) {
+			if (beixiaoyuanhang[i][j] == 1) {
+				//jå¯¹åº”çš„ä½ç½®éœ€è¦æ¶ˆå…ƒ
+				if (xiaoyuanzi[j][j] == 1) {//å¯ä»¥æ¶ˆå…ƒ
+					int k = juzhen - 1;
+					for (; k - 8 >= 0; k -= 8) { // 8ä¸ªå…ƒç´ ä¸€ç»„è¿›è¡ŒAVXå‘é‡è¿ç®—
+						__m256i vec_xiaoyuanzi = _mm256_loadu_si256((__m256i*) & xiaoyuanzi[j][k]); // å°†xiaoyuanziçš„8ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªAVXå‘é‡ä¸­
+						__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & beixiaoyuanhang[i][k]); // å°†beixiaoyuanhangçš„8ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªAVXå‘é‡ä¸­
+						vec_xiaoyuanhang = _mm256_xor_si256(vec_xiaoyuanhang, vec_xiaoyuanzi); // å°†beixiaoyuanhangä¸­å¯¹åº”ä½ç½®ä¸º0çš„å…ƒç´ å˜ä¸º1
+						_mm256_storeu_si256((__m256i*) & beixiaoyuanhang[i][k], vec_xiaoyuanhang); // å°†AVXå‘é‡çš„ç»“æœå­˜å‚¨åˆ°beixiaoyuanhangçš„8ä¸ªå…ƒç´ ä¸­
+					}
+					for (; k >= 0; k--) {
+						if (xiaoyuanzi[j][k] == beixiaoyuanhang[i][k]) {
+							beixiaoyuanhang[i][k] = 0;
+						}
+						else {
+							beixiaoyuanhang[i][k] = 1;
+						}
+					}
+				}
+				else {//å‡çº§æ¶ˆå…ƒå­
+					for (int k = juzhen - 1; k >= 0; k--) {
+						xiaoyuanzi[j][k] = beixiaoyuanhang[i][k];
+						Result[T1 - 1][k] = beixiaoyuanhang[i][k];
+					}
+					T1--;
+					break;
+				}
+			}
+		}
+	}
+
+	QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+	//åœæ­¢æµ‹è¯•
+	cout << "SSE_part2_time:" << (tail - head) * 1000.0 / freq << "ms" << endl;
+	// è¾“å‡ºç»“æœ
+}
+//å¼‚æˆ–éƒ¨åˆ†AVXå¹¶è¡Œ
+void gauss_part3_AVX() {
+	ifstream if1("C://Users//86183//Desktop//è¢«æ¶ˆå…ƒè¡Œ.txt");//æ–‡ä»¶çš„è¯»å…¥
+	ifstream ifs("C://Users//86183//Desktop//æ¶ˆå…ƒå­.txt");//æ–‡ä»¶è¯»å…¥
+	ofstream out("C://Users//86183//Desktop//æ¶ˆå…ƒç»“æœ.txt");//æ–‡ä»¶å†™å‡º
+
+	int T1 = bxhang;
+	//çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < juzhen; i++) {
+		for (int j = 0; j < juzhen; j++) {
+			xiaoyuanzi[juzhen][juzhen] = 0;
+		}
+	}
+	//æ¶ˆå…ƒå­çŸ©é˜µåˆå§‹åŒ–
+	for (int i = 0; i < bxhang; i++) {
+		for (int j = 0; j < bxhang; j++) {
+			Result[i][j] = 0;
+			beixiaoyuanhang[i][j] = 0;
+		}
+	}
+	//ç»“æœçŸ©é˜µå’Œè¢«æ¶ˆå…ƒè¡ŒçŸ©é˜µåˆå§‹åŒ–
+
+
+
+	///è¯»å…¥æ¶ˆå…ƒå­æ–‡ä»¶å†…å®¹
+	string s1;
+	int temp1 = xzi;
+	int T = 0;
+	while (temp1 != 0) {
+		getline(ifs, s1);
+		stringstream ss(s1);//ä¸€æ¬¡è¯»å…¥ä¸€è¡Œ
+		int num;
+		while (ss >> num) {
+			if (T == 0) {
+				T = num;
+				//æ­¤æ—¶Tä¸ºé¦–é¡¹
+			}
+			xiaoyuanzi[T][num] = 1;
+		}
+		T = 0;
+		temp1--;//æ¯è¯»å®Œä¸€è¡Œ-1
+	}
+
+	string s2;
+	int temp2 = bxhang;
+	while (temp2 != 0) {
+		getline(if1, s2);
+		stringstream ss(s2);
+		int num;
+		while (ss >> num) {
+			beixiaoyuanhang[temp2 - 1][num] = 1;
+		}
+		//T = 0;
+		temp2--;
+	}
+
+	//è¯»å…¥è¢«æ¶ˆå…ƒè¡Œæ–‡ä»¶å†…å®¹
+
+	long long head, tail, freq;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+	QueryPerformanceCounter((LARGE_INTEGER*)&head);
+	//å¼€å§‹æµ‹è¯•
+
+	for (int i = bxhang - 1; i >= 0; i--) {
+		for (int j = juzhen - 1; j >= 0; j--) {
+			if (beixiaoyuanhang[i][j] == 1) {
+				//jå¯¹åº”çš„ä½ç½®éœ€è¦æ¶ˆå…ƒ
+				if (xiaoyuanzi[j][j] == 1) {//å¯ä»¥æ¶ˆå…ƒ
+					int k = juzhen - 1;
+					for (; k - 8 >= 0; k -= 8) { // 8ä¸ªå…ƒç´ ä¸€ç»„è¿›è¡ŒAVXå‘é‡è¿ç®—
+						__m256i vec_xiaoyuanzi = _mm256_loadu_si256((__m256i*) & xiaoyuanzi[j][k]); // å°†xiaoyuanziçš„8ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªAVXå‘é‡ä¸­
+						__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & beixiaoyuanhang[i][k]); // å°†beixiaoyuanhangçš„8ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªAVXå‘é‡ä¸­
+						vec_xiaoyuanhang = _mm256_xor_si256(vec_xiaoyuanhang, vec_xiaoyuanzi); // å°†beixiaoyuanhangä¸­å¯¹åº”ä½ç½®ä¸º0çš„å…ƒç´ å˜ä¸º1
+						_mm256_storeu_si256((__m256i*) & beixiaoyuanhang[i][k], vec_xiaoyuanhang); // å°†AVXå‘é‡çš„ç»“æœå­˜å‚¨åˆ°beixiaoyuanhangçš„8ä¸ªå…ƒç´ ä¸­
+					}
+					for (; k >= 0; k--) {
+						if (xiaoyuanzi[j][k] == beixiaoyuanhang[i][k]) {
+							beixiaoyuanhang[i][k] = 0;
+						}
+						else {
+							beixiaoyuanhang[i][k] = 1;
+						}
+					}
+				}
+				else {//å‡çº§æ¶ˆå…ƒå­
+					int k = juzhen - 1;
+					for (; k - 8 >= 0; k -= 8) {
+						__m256i vec_xiaoyuanhang = _mm256_loadu_si256((__m256i*) & beixiaoyuanhang[i][k]); // å°†beixiaoyuanhangçš„8ä¸ªå…ƒç´ è£…è½½åˆ°ä¸€ä¸ªAVXå‘é‡ä¸­
+						_mm256_storeu_si256((__m256i*) & xiaoyuanzi[j][k], vec_xiaoyuanhang); // å°†AVXå‘é‡çš„ç»“æœå­˜å‚¨åˆ°xiaoyuanziçš„8ä¸ªå…ƒç´ ä¸­
+						_mm256_storeu_si256((__m256i*) & Result[T1 - 1][k], vec_xiaoyuanhang); // å°†AVXå‘é‡çš„ç»“æœå­˜å‚¨åˆ°Resultçš„8ä¸ªå…ƒç´ ä¸­
+					}
+					for (; k >= 0; k--) {
+						xiaoyuanzi[j][k] = beixiaoyuanhang[i][k];
+						Result[T1 - 1][k] = beixiaoyuanhang[i][k];
+					}
+					T1--;
+					break;
+				}
+			}
+		}
+	}
+
+	QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+	//åœæ­¢æµ‹è¯•
+	cout << "SSE_part3_time:" << (tail - head) * 1000.0 / freq << "ms" << endl;
+	// è¾“å‡ºç»“æœ
+}
+//å®Œå…¨AVXå¹¶è¡Œ
+//
+//void getout() {
+//	int outtemp = 0;
+//	for (int i = bxhang - 1; i >= 0; i--) {
+//		for (int j = juzhen - 1; j >= 0; j--) {
+//			if (Result[i][j] == 1) {
+//				outtemp = 1;
+//				out << j << " ";
+//			}
+//			if (j == 0 && outtemp == 1) {
+//				out << endl;
+//			}
+//		}
+//		outtemp = 0;
+//	}
+//	/*for (int i = bxhang - 1; i >= 0; i--) {
+//		for (int j = juzhen - 1; j >= 0; j--) {
+//			if (Result[i][j] == 1) {
+//				outtemp = 1;
+//				cout << j << " ";
+//			}
+//			if (j == 0 && outtemp == 1) {
+//				cout << endl;
+//			}
+//		}
+//		outtemp = 0;
+//	}*/
+//}
+//è¾“å‡ºç»“æœ
+
+
 int main() {
-	for (int i = 1; i <= 20; i++)
-	{
-		chuanx();
-		SSE1();
-		SSE2();
-		SSE3();
-		AVX4();
-		AVX5();
-		AVX6();
-	}
-	cout << "´®ĞĞËã·¨Æ½¾ùÔËĞĞÊ±¼ä" << time1 / 20 <<"ms"<< endl;
-	cout << "´æ´¢¹ı³ÌÏòÁ¿»¯Æ½¾ùÔËĞĞÊ±¼ä" << time2 / 20 << "ms" << endl;
-	cout << "Òì»ò¹ı³ÌÏòÁ¿»¯Æ½¾ùÔËĞĞÊ±¼ä" << time3 / 20 << "ms" << endl;
-	cout << "SSEÏòÁ¿»¯Æ½¾ùÔËĞĞÊ±¼ä" << time4 / 20 << "ms" << endl;
-	cout << "AVX1ÏòÁ¿»¯Æ½¾ùÔËĞĞÊ±¼ä" << time5 / 20 << "ms" << endl;
-	cout << "AVX2ÏòÁ¿»¯Æ½¾ùÔËĞĞÊ±¼ä" << time6 / 20 << "ms" << endl;
-	cout << "AVX3ÏòÁ¿»¯Æ½¾ùÔËĞĞÊ±¼ä" << time7 / 20 << "ms" << endl;
+
+	//check();//éªŒè¯ç»“æœæ˜¯å¦æ­£ç¡®çš„å‡½æ•°
+	//xiaoyuan();
+	xiaoyuan();
+	gauss_part1_SIMD();
+	gauss_part2_SIMD();
+	gauss_part3_SIMD();
+	gauss_part1_AVX();
+	gauss_part2_AVX();
+	gauss_part3_AVX();
+	//getout();			//ä¸ºäº†é˜²æ­¢ä¸åŒç®—æ³•åŒæ—¶å†™æ–‡ä»¶å¯¼è‡´æ–‡ä»¶æœ‰å¤šä¸ªç»“æœï¼Œæ‰€ä»¥åªæœ‰ä¸€æ¬¡å†™æ–‡ä»¶æ“ä½œ
 }
